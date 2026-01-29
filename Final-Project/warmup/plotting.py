@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 
 # Named tuple for episode statistics
 EpisodeStats = namedtuple("Stats", ["episode_lengths", "episode_rewards"])
-
+# test
 def plot_cost_to_go_mountain_car(env, estimator, num_tiles=20):
     """
     Plot cost-to-go function for Mountain Car environment.
