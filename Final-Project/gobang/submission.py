@@ -50,7 +50,7 @@ class Actor(nn.Module):
     """
 
     def __init__(self, board_size: int, lr=1e-4, use_se: bool = True, channels: int = 32, reduction: int = 16, hidden: int = 256, dropout: float = 0.2):
-        """两层卷积结构 + LayerNorm + 可选 SE。
+        """两层卷积结构 + GroupNorm + 可选 SE。
 
         参数：
         - channels: 卷积输出通道数
@@ -99,12 +99,12 @@ class Actor(nn.Module):
         conv_layers = [
             # 卷积层1
             nn.Conv2d(in_channels=1, out_channels=channels, kernel_size=kernel_size, padding=padding),
-            nn.LayerNorm([channels, board_size, board_size]),
+            nn.GroupNorm(num_groups=8, num_channels=channels),  # 更小的组数适配较少通道
             nn.SiLU(),  # 保留SiLU
             
             # 卷积层2
             nn.Conv2d(in_channels=channels, out_channels=channels, kernel_size=kernel_size, padding=padding),
-            nn.LayerNorm([channels, board_size, board_size]),
+            nn.GroupNorm(num_groups=8, num_channels=channels),
             nn.SiLU(),
         ]
         # 保留SE模块（可选）
@@ -223,12 +223,12 @@ class Critic(nn.Module):
         conv_layers = [
             # 卷积层1
             nn.Conv2d(in_channels=1, out_channels=channels, kernel_size=kernel_size, padding=padding),
-            nn.LayerNorm([channels, board_size, board_size]),
+            nn.GroupNorm(num_groups=8, num_channels=channels),
             nn.SiLU(),
             
             # 卷积层2
             nn.Conv2d(in_channels=channels, out_channels=channels, kernel_size=kernel_size, padding=padding),
-            nn.LayerNorm([channels, board_size, board_size]),
+            nn.GroupNorm(num_groups=8, num_channels=channels),
             nn.SiLU(),
         ]
         # 保留SE模块

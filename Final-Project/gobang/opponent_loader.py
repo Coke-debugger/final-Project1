@@ -37,69 +37,32 @@ def get_opponent():
             use_se = any(k.startswith('actor.conv_blocks') and '.fc.' in k for k in sd.keys())
             return {'channels': ch or 64, 'hidden': hidden or 512, 'use_se': use_se}
 
-        def _safe_load(model, state_dict):
-            try:
-                model.load_state_dict(state_dict)
-                return True, {'method': 'strict', 'skipped': [], 'converted': []}
-            except RuntimeError as e:
-                print(f"Strict load failed: {e}")
-                model_sd = model.state_dict()
-                filtered = {}
-                skipped = []
-                converted = []
-                for k, v in state_dict.items():
-                    if k not in model_sd:
-                        skipped.append((k, v.shape, None))
-                        continue
-                    tgt = model_sd[k]
-                    if v.shape == tgt.shape:
-                        filtered[k] = v
-                    else:
-                        if v.dim() == 1 and tgt.dim() >= 3 and v.shape[0] == tgt.shape[0]:
-                            try:
-                                new_v = v.view(-1, 1, 1).expand_as(tgt).clone()
-                                filtered[k] = new_v
-                                converted.append(k)
-                                continue
-                            except Exception:
-                                skipped.append((k, v.shape, tgt.shape))
-                                continue
-                        skipped.append((k, v.shape, tgt.shape))
-                try:
-                    res = model.load_state_dict(filtered, strict=False)
-                    missing = getattr(res, 'missing_keys', None)
-                    unexpected = getattr(res, 'unexpected_keys', None)
-                    info = {'method': 'filtered_non_strict', 'skipped': skipped, 'converted': converted, 'missing': missing, 'unexpected': unexpected}
-                    return True, info
-                except RuntimeError as e2:
-                    print(f"Filtered non-strict load also failed: {e2}")
-                    return False, {'error': str(e2)}
-
         if arch is not None:
             opponent = GobangModel(board_size=board_size, bound=bound, use_se=arch.get('use_se', True), channels=arch.get('channels', 64) or 64, reduction=arch.get('reduction', 16) or 16, hidden=arch.get('hidden', 512) or 512, dropout=arch.get('dropout', 0.2) or 0.2)
-            ok, info = _safe_load(opponent, state)
-            if ok:
-                print(f"Loaded opponent checkpoint with arch metadata (method={info['method']}).")
-                if info.get('skipped'):
-                    print(f"Skipped keys due to incompatibility: {info['skipped']}")
-                if info.get('converted'):
-                    print(f"Converted keys by broadcasting: {info['converted'][:10]}{'...' if len(info['converted'])>10 else ''}")
+            try:
+                opponent.load_state_dict(state)
+                print(f"Loaded opponent checkpoint with arch metadata (strict load).")
                 return opponent
+            except RuntimeError as e:
+                print(f"Strict load failed with arch metadata: {e}")
         # fallback to inference
         inferred = infer_arch_from_state(state)
         print(f"Inferred arch for opponent: {inferred}")
         opponent = GobangModel(board_size=board_size, bound=bound, use_se=inferred['use_se'], channels=inferred['channels'], hidden=inferred['hidden'])
-        ok, info = _safe_load(opponent, state)
-        if ok:
-            print(f"Loaded opponent checkpoint after inference (method={info['method']}).")
-            if info.get('skipped'):
-                print(f"Skipped keys due to incompatibility: {info['skipped']}")
-            if info.get('converted'):
-                print(f"Converted keys by broadcasting: {info['converted'][:10]}{'...' if len(info['converted'])>10 else ''}")
+        try:
+            opponent.load_state_dict(state)
+            print(f"Loaded opponent checkpoint after inference (strict load).")
             return opponent
-        else:
-            print(f"Failed to load opponent checkpoint after inference: {info.get('error')}")
-
+        except RuntimeError as e:
+            print(f"Strict load failed after inference: {e}")
+            res = opponent.load_state_dict(state, strict=False)
+            missing = getattr(res, 'missing_keys', None)
+            unexpected = getattr(res, 'unexpected_keys', None)
+            print(f"Non-strict load after inference. Missing: {missing}; Unexpected: {unexpected}")
+            matched = len(opponent.state_dict()) - (len(missing) if missing else 0)
+            if matched > 0:
+                print(f"Using opponent model after non-strict load (matched {matched} keys).")
+                return opponent
 
     # 若找不到模型文件或加载失败，返回一个随机对手实现：在所有空位上均匀采样
     class RandomOpponent:
