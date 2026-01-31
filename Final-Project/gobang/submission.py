@@ -6,7 +6,7 @@ from typing import *
 import sys
 import argparse
 
-# 全局设备配置（确保utils中定义了device，这里兜底定义）
+# 全局设备配置（确保utils中定义了device）
 if 'device' not in globals():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -327,7 +327,7 @@ class GobangModel(nn.Module):
         targets = torch.clamp(targets, -q_clip, q_clip)
         critic_loss = nn.SmoothL1Loss()(qs, targets.detach())
 
-        # 计算动作索引（支持 torch 张量或 numpy）
+        # 计算动作索引（支持 torch 张量）
         if isinstance(actions, torch.Tensor):
             acts = actions.to(device).long()
         else:
