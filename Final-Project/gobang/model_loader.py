@@ -93,32 +93,6 @@ def get_model():
     # Fallback
     print("Warning: failed to cleanly load checkpoint. Returning uninitialized model.")
     return GobangModel(board_size=board_size, bound=bound).to(device)
-    # Try constructing model by inferring arch from state_dict
-    inferred = infer_arch_from_state(state)
-    print(f"Inferred arch from checkpoint: {inferred}")
-    model = GobangModel(board_size=board_size, bound=bound, use_se=inferred['use_se'], channels=inferred['channels'], hidden=inferred['hidden']).to(device)
-    try:
-        model.load_state_dict(state)
-        print(f"Loaded checkpoint {ckpt_path} after inferring arch (strict load).")
-        return model
-    except RuntimeError as e:
-        print(f"Strict load failed after inference: {e}")
-        # try non-strict load
-        try:
-            res = model.load_state_dict(state, strict=False)
-            missing = getattr(res, 'missing_keys', None)
-            unexpected = getattr(res, 'unexpected_keys', None)
-            print(f"Non-strict load after inference. Missing: {missing}; Unexpected: {unexpected}")
-            matched = len(model.state_dict()) - (len(missing) if missing else 0)
-            if matched > 0:
-                print(f"Using model after non-strict load (matched {matched} keys).")
-                return model
-        except RuntimeError as e2:
-            print(f"Non-strict load also failed: {e2}")
-
-    # Fallback
-    print("Warning: failed to cleanly load checkpoint. Returning uninitialized model.")
-    return GobangModel(board_size=board_size, bound=bound).to(device)
 
 
 
