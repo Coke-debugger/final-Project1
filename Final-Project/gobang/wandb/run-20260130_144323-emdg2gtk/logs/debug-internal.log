@@ -1,0 +1,13 @@
+{"time":"2026-01-30T14:43:25.7804797+08:00","level":"INFO","msg":"stream: starting","core version":"0.24.1"}
+{"time":"2026-01-30T14:43:27.5622489+08:00","level":"INFO","msg":"stream: created new stream","id":"emdg2gtk"}
+{"time":"2026-01-30T14:43:27.5622489+08:00","level":"INFO","msg":"handler: started","stream_id":"emdg2gtk"}
+{"time":"2026-01-30T14:43:27.5637772+08:00","level":"INFO","msg":"stream: started","id":"emdg2gtk"}
+{"time":"2026-01-30T14:43:27.5637772+08:00","level":"INFO","msg":"sender: started","stream_id":"emdg2gtk"}
+{"time":"2026-01-30T14:43:27.5637772+08:00","level":"INFO","msg":"writer: started","stream_id":"emdg2gtk"}
+{"time":"2026-01-30T14:50:11.4236165+08:00","level":"INFO","msg":"api: retrying error","error":"Post \"https://api.wandb.ai/files/hugengyuan-ustc/gobang-rl-AI3002/emdg2gtk/file_stream\": read tcp 192.168.11.142:61648->35.186.228.49:443: wsarecv: An established connection was aborted by the software in your host machine."}
+{"time":"2026-01-30T14:55:44.9202288+08:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2026-01-30T14:55:45.3742322+08:00","level":"INFO","msg":"handler: operation stats","stats":{}}
+{"time":"2026-01-30T14:55:45.37781+08:00","level":"INFO","msg":"stream: closing","id":"emdg2gtk"}
+{"time":"2026-01-30T14:55:45.37781+08:00","level":"INFO","msg":"handler: closed","stream_id":"emdg2gtk"}
+{"time":"2026-01-30T14:55:45.37781+08:00","level":"INFO","msg":"sender: closed","stream_id":"emdg2gtk"}
+{"time":"2026-01-30T14:55:45.37781+08:00","level":"INFO","msg":"stream: closed","id":"emdg2gtk"}

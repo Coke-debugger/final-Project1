@@ -1,0 +1,12 @@
+{"time":"2026-01-30T22:26:25.9883824+08:00","level":"INFO","msg":"stream: starting","core version":"0.24.1"}
+{"time":"2026-01-30T22:26:27.915858+08:00","level":"INFO","msg":"stream: created new stream","id":"lussk9xi"}
+{"time":"2026-01-30T22:26:27.915858+08:00","level":"INFO","msg":"handler: started","stream_id":"lussk9xi"}
+{"time":"2026-01-30T22:26:27.9168792+08:00","level":"INFO","msg":"stream: started","id":"lussk9xi"}
+{"time":"2026-01-30T22:26:27.9168792+08:00","level":"INFO","msg":"sender: started","stream_id":"lussk9xi"}
+{"time":"2026-01-30T22:26:27.9168792+08:00","level":"INFO","msg":"writer: started","stream_id":"lussk9xi"}
+{"time":"2026-01-30T22:32:32.977638+08:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2026-01-30T22:32:34.3805077+08:00","level":"INFO","msg":"handler: operation stats","stats":{}}
+{"time":"2026-01-30T22:32:34.3865367+08:00","level":"INFO","msg":"stream: closing","id":"lussk9xi"}
+{"time":"2026-01-30T22:32:34.3865367+08:00","level":"INFO","msg":"handler: closed","stream_id":"lussk9xi"}
+{"time":"2026-01-30T22:32:34.3865367+08:00","level":"INFO","msg":"sender: closed","stream_id":"lussk9xi"}
+{"time":"2026-01-30T22:32:34.3865367+08:00","level":"INFO","msg":"stream: closed","id":"lussk9xi"}

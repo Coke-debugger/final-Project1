@@ -1,0 +1,44 @@
+{
+  "os":  "Windows-10-10.0.22631-SP0",
+  "python":  "CPython 3.10.18",
+  "startedAt":  "2026-01-30T15:27:44.883412Z",
+  "args":  [
+    "--num_episodes=3000",
+    "--checkpoint=3000",
+    "--use_wandb"
+  ],
+  "program":  "D:\\AI3002\\final-Project1\\final-project\\gobang\\submission.py",
+  "codePath":  "final-project\\gobang\\submission.py",
+  "codePathLocal":  "submission.py",
+  "git":  {
+    "remote":  "git@github.com:Coke-debugger/final-Project1.git",
+    "commit":  "11f11c8e0a287b40bfd65a413882021480d6d3d6"
+  },
+  "root":  "D:\\AI3002\\final-Project1\\final-project\\gobang",
+  "host":  "LAPTOP-B690SUI1",
+  "executable":  "D:\\anaconda3\\envs\\ai25\\python.exe",
+  "cpu_count":  8,
+  "cpu_count_logical":  16,
+  "gpu":  "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "gpu_count":  1,
+  "disk":  {
+    "/":  {
+      "total":  "267360661504",
+      "used":  "239876640768"
+    }
+  },
+  "memory":  {
+    "total":  "16344801280"
+  },
+  "gpu_nvidia":  [
+    {
+      "name":  "NVIDIA GeForce RTX 4060 Laptop GPU",
+      "memoryTotal":  "8585740288",
+      "cudaCores":  3072,
+      "architecture":  "Ada",
+      "uuid":  "GPU-5206bc48-36f0-553b-1b83-4d4407913938"
+    }
+  ],
+  "cudaVersion":  "13.0",
+  "writerId":  "g931whmbo579i6talap9qftbffecvqcf"
+}

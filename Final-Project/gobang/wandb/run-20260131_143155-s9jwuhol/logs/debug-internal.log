@@ -1,0 +1,13 @@
+{"time":"2026-01-31T14:31:57.4688039+08:00","level":"INFO","msg":"stream: starting","core version":"0.24.1"}
+{"time":"2026-01-31T14:31:58.6233426+08:00","level":"INFO","msg":"stream: created new stream","id":"s9jwuhol"}
+{"time":"2026-01-31T14:31:58.6233426+08:00","level":"INFO","msg":"handler: started","stream_id":"s9jwuhol"}
+{"time":"2026-01-31T14:31:58.6243779+08:00","level":"INFO","msg":"stream: started","id":"s9jwuhol"}
+{"time":"2026-01-31T14:31:58.6243779+08:00","level":"INFO","msg":"sender: started","stream_id":"s9jwuhol"}
+{"time":"2026-01-31T14:31:58.6243779+08:00","level":"INFO","msg":"writer: started","stream_id":"s9jwuhol"}
+{"time":"2026-01-31T14:35:44.6369115+08:00","level":"INFO","msg":"api: retrying HTTP error","status":502,"url":"https://api.wandb.ai/files/hugengyuan-ustc/gobang-rl-AI3002/s9jwuhol/file_stream","body":"\n<html><head>\n<meta http-equiv=\"content-type\" content=\"text/html;charset=utf-8\">\n<title>502 Server Error</title>\n</head>\n<body text=#000000 bgcolor=#ffffff>\n<h1>Error: Server Error</h1>\n<h2>The server encountered a temporary error and could not complete your request.<p>Please try again in 30 seconds.</h2>\n<h2></h2>\n</body></html>\n"}
+{"time":"2026-01-31T14:38:16.7868409+08:00","level":"INFO","msg":"fileTransfer: Close: file transfer manager closed"}
+{"time":"2026-01-31T14:38:17.2612866+08:00","level":"INFO","msg":"handler: operation stats","stats":{}}
+{"time":"2026-01-31T14:38:17.265923+08:00","level":"INFO","msg":"stream: closing","id":"s9jwuhol"}
+{"time":"2026-01-31T14:38:17.265923+08:00","level":"INFO","msg":"handler: closed","stream_id":"s9jwuhol"}
+{"time":"2026-01-31T14:38:17.265923+08:00","level":"INFO","msg":"sender: closed","stream_id":"s9jwuhol"}
+{"time":"2026-01-31T14:38:17.265923+08:00","level":"INFO","msg":"stream: closed","id":"s9jwuhol"}

@@ -1,0 +1,1 @@
+{"_timestamp":1.7698497261879847e+09,"_step":2999,"critic_loss":2.2346813678741455,"actor_loss":-0.2189754843711853,"_runtime":368,"entropy":0.058512672781944275,"episode":2999,"_wandb":{"runtime":368},"actor_loss_neg":0.2189754843711853}
