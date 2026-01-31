@@ -30,7 +30,7 @@ class SEBlock(nn.Module):
         self.avgpool = nn.AdaptiveAvgPool2d(1)
         self.fc = nn.Sequential(
             nn.Linear(channels, mid),
-            nn.SiLU(),
+            nn.GELU(),
             nn.Linear(mid, channels),
             nn.Sigmoid()
         )
@@ -50,7 +50,7 @@ class Actor(nn.Module):
     """
 
     def __init__(self, board_size: int, lr=1e-4, use_se: bool = True, channels: int = 32, reduction: int = 16, hidden: int = 256, dropout: float = 0.2):
-        """两层卷积结构 + GroupNorm + 可选 SE。
+        """两层卷积结构 + 可选 SE。
 
         参数：
         - channels: 卷积输出通道数
@@ -99,25 +99,23 @@ class Actor(nn.Module):
         conv_layers = [
             # 卷积层1
             nn.Conv2d(in_channels=1, out_channels=channels, kernel_size=kernel_size, padding=padding),
-            nn.GroupNorm(num_groups=8, num_channels=channels),  # 更小的组数适配较少通道
-            nn.SiLU(),  # 保留SiLU
+            nn.GELU(),  # 保留ReLU
             
             # 卷积层2
             nn.Conv2d(in_channels=channels, out_channels=channels, kernel_size=kernel_size, padding=padding),
-            nn.GroupNorm(num_groups=8, num_channels=channels),
-            nn.SiLU(),
+            nn.GELU(),
         ]
+
         # 保留SE模块（可选）
         if self.use_se:
             conv_layers.append(SEBlock(channels=channels, reduction=reduction))
         conv_layers.append(nn.Flatten())
         self.conv_blocks = nn.Sequential(*conv_layers)
-        # 全连接层：使用LayerNorm+Dropout，保留GELU
+        # 全连接层：Dropout + SiLU
         conv_output_dim = channels * board_size * board_size
         self.linear_blocks = nn.Sequential(
             nn.Linear(in_features=conv_output_dim, out_features=hidden),
-            nn.LayerNorm(hidden),  # LayerNorm
-            nn.SiLU(),  
+            nn.GELU(),  
             nn.Dropout(dropout),  # 增加Dropout防止过拟合
             nn.Linear(in_features=hidden, out_features=board_size ** 2),
         )
@@ -223,25 +221,23 @@ class Critic(nn.Module):
         conv_layers = [
             # 卷积层1
             nn.Conv2d(in_channels=1, out_channels=channels, kernel_size=kernel_size, padding=padding),
-            nn.GroupNorm(num_groups=8, num_channels=channels),
-            nn.SiLU(),
+            nn.GELU(),
             
             # 卷积层2
             nn.Conv2d(in_channels=channels, out_channels=channels, kernel_size=kernel_size, padding=padding),
-            nn.GroupNorm(num_groups=8, num_channels=channels),
-            nn.SiLU(),
+            nn.GELU(),
         ]
+
         # 保留SE模块
         if self.use_se:
             conv_layers.append(SEBlock(channels=channels, reduction=reduction))
         conv_layers.append(nn.Flatten())
         self.conv_blocks = nn.Sequential(*conv_layers)
-        # 全连接层：LayerNorm+Dropout+保留GELU
+        # 全连接层：Dropout + SiLU
         conv_output_dim = channels * board_size * board_size
         self.linear_blocks = nn.Sequential(
             nn.Linear(in_features=conv_output_dim, out_features=hidden),
-            nn.LayerNorm(hidden),
-            nn.SiLU(),
+            nn.GELU(),
             nn.Dropout(dropout),
             nn.Linear(in_features=hidden, out_features=board_size ** 2),
         )

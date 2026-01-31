@@ -16,7 +16,7 @@ bound = 5
 def get_model():
     from submission import GobangModel
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    ckpt_path = os.path.join(os.path.dirname(__file__), 'checkpoints', 'model_2999_7.pth')
+    ckpt_path = os.path.join(os.path.dirname(__file__), 'checkpoints', 'model_2999_10.pth')
 
     if not os.path.exists(ckpt_path):
         print(f"Warning: checkpoint not found at {ckpt_path}. Returning default model (no weights).")

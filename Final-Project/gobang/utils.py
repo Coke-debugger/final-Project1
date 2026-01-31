@@ -367,7 +367,7 @@ def train_model(model, num_episodes=1000, checkpoint=1000, gamma=0.5):
                 'dropout': float(getattr(model.actor, 'dropout', None)) if getattr(model.actor, 'dropout', None) is not None else None,
             }
             ckpt = {'arch': arch, 'state_dict': model.state_dict()}
-            torch.save(ckpt, f"checkpoints/model_{_}_8.pth")
+            torch.save(ckpt, f"checkpoints/model_{_}_11.pth")
 
 
 __all__ = ['_position_to_index', '_index_to_position', '_sample_response', 'train_model',

@@ -14,7 +14,7 @@ bound = 5
 
 def get_opponent():
     import os
-    ckpt_path = os.path.join(os.path.dirname(__file__), 'checkpoints', 'model_2999.pth')
+    ckpt_path = os.path.join(os.path.dirname(__file__), 'checkpoints', 'model_2999_11.pth')
 
     if os.path.exists(ckpt_path):
         from submission import GobangModel
