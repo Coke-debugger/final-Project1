@@ -321,10 +321,11 @@ class GobangModel(nn.Module):
         """
 
         # 目标 q 值和 critic 损失
-        targets = rewards + gamma * next_qs
+        # 修复错误1: 正确的贝尔曼方程用于计算目标Q值
+        targets = rewards + gamma * next_qs.detach()
         q_clip = 100.0         # 可调
         targets = torch.clamp(targets, -q_clip, q_clip)
-        critic_loss = nn.SmoothL1Loss()(qs, targets)
+        critic_loss = nn.SmoothL1Loss()(qs, targets.detach())
 
         # 计算动作索引（支持 torch 张量或 numpy）
         if isinstance(actions, torch.Tensor):
@@ -337,20 +338,21 @@ class GobangModel(nn.Module):
         aimed_policy = policy[torch.arange(indices.size(0), device=device), indices]
 
         # actor loss: 原始策略梯度目标（未加入熵正则）
-        actor_loss = -torch.mean(torch.log(aimed_policy + eps) * qs.clone().detach())
+        # 修复错误2: 使用正确的策略梯度更新，避免梯度传播到QS
+        actor_loss = -torch.mean(torch.log(aimed_policy + eps) * qs.detach())
 
-        # Bug3修复：分开优化Actor和Critic，确保step()调用
-        # 优化Actor
-        self.actor.optimizer.zero_grad()
-        actor_loss.backward(retain_graph=True)
-        torch.nn.utils.clip_grad_norm_(self.actor.parameters(), max_norm=1.0) # 防止梯度爆炸
-        self.actor.optimizer.step()
-
+        # 修复错误3: 分开优化Actor和Critic，确保step()调用
         # 优化Critic
         self.critic.optimizer.zero_grad()
         critic_loss.backward()
         torch.nn.utils.clip_grad_norm_(self.critic.parameters(), max_norm=1.0)
         self.critic.optimizer.step()
+
+        # 优化Actor
+        self.actor.optimizer.zero_grad()
+        actor_loss.backward()
+        torch.nn.utils.clip_grad_norm_(self.actor.parameters(), max_norm=1.0)
+        self.actor.optimizer.step()
 
         return actor_loss, critic_loss
 
