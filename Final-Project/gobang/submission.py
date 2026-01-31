@@ -50,7 +50,7 @@ class Actor(nn.Module):
     """
 
     def __init__(self, board_size: int, lr=1e-4, use_se: bool = True, channels: int = 32, reduction: int = 16, hidden: int = 256, dropout: float = 0.2):
-        """两层卷积结构 + GroupNorm + 可选 SE。
+        """两层卷积结构 + LayerNorm + 可选 SE。
 
         参数：
         - channels: 卷积输出通道数
@@ -99,12 +99,12 @@ class Actor(nn.Module):
         conv_layers = [
             # 卷积层1
             nn.Conv2d(in_channels=1, out_channels=channels, kernel_size=kernel_size, padding=padding),
-            nn.GroupNorm(num_groups=8, num_channels=channels),  # 更小的组数适配较少通道
+            nn.LayerNorm([channels, board_size, board_size]),
             nn.SiLU(),  # 保留SiLU
             
             # 卷积层2
             nn.Conv2d(in_channels=channels, out_channels=channels, kernel_size=kernel_size, padding=padding),
-            nn.GroupNorm(num_groups=8, num_channels=channels),
+            nn.LayerNorm([channels, board_size, board_size]),
             nn.SiLU(),
         ]
         # 保留SE模块（可选）
@@ -200,6 +200,7 @@ class Critic(nn.Module):
 
     主要思路是：先得到一个形状为 (B, N ** 2) 的张量，表示在给定统一化状态（(B,1,N,N)）下所有可能动作的 Q 值，
     然后从该张量中抽取每个动作 (i,j) 对应的 Q 值（应充分利用 _position_to_index 获取动作索引）。
+
     最后返回形状为 (B,) 的张量，包含这些 Q 值。
     """
 
@@ -222,12 +223,12 @@ class Critic(nn.Module):
         conv_layers = [
             # 卷积层1
             nn.Conv2d(in_channels=1, out_channels=channels, kernel_size=kernel_size, padding=padding),
-            nn.GroupNorm(num_groups=8, num_channels=channels),
+            nn.LayerNorm([channels, board_size, board_size]),
             nn.SiLU(),
             
             # 卷积层2
             nn.Conv2d(in_channels=channels, out_channels=channels, kernel_size=kernel_size, padding=padding),
-            nn.GroupNorm(num_groups=8, num_channels=channels),
+            nn.LayerNorm([channels, board_size, board_size]),
             nn.SiLU(),
         ]
         # 保留SE模块
@@ -325,7 +326,9 @@ class GobangModel(nn.Module):
 
         # 目标 q 值和 critic 损失
         targets = rewards + gamma * next_qs
-        critic_loss = nn.MSELoss()(qs, targets)
+        q_clip = 100.0         # 可调
+        targets = torch.clamp(targets, -q_clip, q_clip)
+        critic_loss = nn.SmoothL1Loss()(qs, targets)
 
         # 计算动作索引（支持 torch 张量或 numpy）
         if isinstance(actions, torch.Tensor):
@@ -343,12 +346,14 @@ class GobangModel(nn.Module):
         # Bug3修复：分开优化Actor和Critic，确保step()调用
         # 优化Actor
         self.actor.optimizer.zero_grad()
-        actor_loss.backward(retain_graph=True)  # 保留计算图给Critic
+        actor_loss.backward(retain_graph=True)
+        torch.nn.utils.clip_grad_norm_(self.actor.parameters(), max_norm=1.0) # 防止梯度爆炸
         self.actor.optimizer.step()
 
         # 优化Critic
         self.critic.optimizer.zero_grad()
         critic_loss.backward()
+        torch.nn.utils.clip_grad_norm_(self.critic.parameters(), max_norm=1.0)
         self.critic.optimizer.step()
 
         return actor_loss, critic_loss

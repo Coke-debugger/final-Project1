@@ -334,14 +334,18 @@ def train_model(model, num_episodes=1000, checkpoint=1000, gamma=0.5):
         actor_records.append(float(actor_loss))
         critic_records.append(float(critic_loss))
         
-        if WANDB_AVAILABLE:
-            wandb.log({
-                "episode": _,
-                "actor_loss": float(actor_loss),
-                "critic_loss": float(critic_loss),
-                "entropy": entropy,
-                "actor_loss_neg": -float(actor_loss),
-            })
+        # 仅在 wandb 已安装且已初始化时记录日志，避免未调用 wandb.init() 导致程序崩溃
+        if WANDB_AVAILABLE and getattr(wandb, 'run', None) is not None:
+            try:
+                wandb.log({
+                    "episode": _,
+                    "actor_loss": float(actor_loss),
+                    "critic_loss": float(critic_loss),
+                    "entropy": entropy,
+                    "actor_loss_neg": -float(actor_loss),
+                })
+            except Exception as e:
+                print(f"Warning: wandb.log failed: {e}")
         
         print(
             f"Episode {_} / {num_episodes}: Actor Loss {-actor_loss}, Critic Loss "
@@ -353,7 +357,17 @@ def train_model(model, num_episodes=1000, checkpoint=1000, gamma=0.5):
                 print(e)
         if (_ + 1) % checkpoint == 0:
             os.makedirs("checkpoints", exist_ok=True)
-            torch.save(model.state_dict(), f"checkpoints/model_{_}.pth")
+            # 保存带架构信息的 checkpoint，便于后续兼容加载
+            se_block = next((m for m in model.actor.modules() if m.__class__.__name__ == 'SEBlock'), None)
+            arch = {
+                'use_se': bool(model.use_se),
+                'channels': int(getattr(model.actor, 'channels', None)) if getattr(model.actor, 'channels', None) is not None else None,
+                'hidden': int(getattr(model.actor, 'hidden', None)) if getattr(model.actor, 'hidden', None) is not None else None,
+                'reduction': int(getattr(se_block, 'reduction', None)) if se_block is not None else None,
+                'dropout': float(getattr(model.actor, 'dropout', None)) if getattr(model.actor, 'dropout', None) is not None else None,
+            }
+            ckpt = {'arch': arch, 'state_dict': model.state_dict()}
+            torch.save(ckpt, f"checkpoints/model_{_}_8.pth")
 
 
 __all__ = ['_position_to_index', '_index_to_position', '_sample_response', 'train_model',
