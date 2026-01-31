@@ -99,19 +99,19 @@ class Actor(nn.Module):
         conv_layers = [
             # 卷积层1
             nn.Conv2d(in_channels=1, out_channels=channels, kernel_size=kernel_size, padding=padding),
-            nn.GELU(),  # 保留ReLU
+            nn.GELU(), 
             
             # 卷积层2
             nn.Conv2d(in_channels=channels, out_channels=channels, kernel_size=kernel_size, padding=padding),
             nn.GELU(),
         ]
 
-        # 保留SE模块（可选）
+        # 保留SE模块
         if self.use_se:
             conv_layers.append(SEBlock(channels=channels, reduction=reduction))
         conv_layers.append(nn.Flatten())
         self.conv_blocks = nn.Sequential(*conv_layers)
-        # 全连接层：Dropout + SiLU
+        # 全连接层：Dropout + GELU
         conv_output_dim = channels * board_size * board_size
         self.linear_blocks = nn.Sequential(
             nn.Linear(in_features=conv_output_dim, out_features=hidden),
